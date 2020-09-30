@@ -1,1 +1,3 @@
 # DCS_Stats
+##SYNOPSIS
+##INSTALLATION
