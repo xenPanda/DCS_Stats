@@ -14,4 +14,5 @@
 1. Setup Requirements
 2. Save Get_Stat.bat and stat_collector.py to a directory on the DCS Server
 3. Import stats.sql on mysql server
-4. 
+4. Edit stats_collector.py to complete the #MYSQL Setup section
+5. 
