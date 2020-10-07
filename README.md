@@ -8,7 +8,7 @@
 2. DCS Server
 3. MYSQL Server
 4. Web Server
-5. Slmod version 7.5
+5. <a href="https://github.com/mrSkortch/DCS-SLmod/archive/master.zip">Slmod version 7.5</a>
 
 ## INSTALLATION
 
