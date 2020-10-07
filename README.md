@@ -4,7 +4,7 @@
 
 ## REQUIREMENTS
 
-1. Python 3.8 (Installed on DCS Server)
+1. <a href="https://www.python.org/ftp/python/3.8.6/python-3.8.6-amd64.exe">Python 3.8 (Installed on DCS Server)</a>
 2. DCS Server
 3. MYSQL Server
 4. Web Server
