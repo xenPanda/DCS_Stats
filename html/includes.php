@@ -1,3 +1,12 @@
+<!--
+  DCS_Stats - DCS stats collection via Slmod and insert into MySql DB
+
+  Author: Chris Barilla (Panda)
+  Date:   09/05/2020
+
+  Filename: includes.php
+  Version: 0.0.1
+-->
 <?php
 require_once 'db_connector.php';
 
