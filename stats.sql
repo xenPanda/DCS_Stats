@@ -1,3 +1,11 @@
+-- DCS_Stats - DCS stats collection via Slmod and insert into MySql DB
+
+-- Author: Chris Barilla (Panda)
+-- Date:   09/05/2020
+
+-- Filename: stats.sql
+-- Version: 0.0.1
+
 -- phpMyAdmin SQL Dump
 -- version 5.0.2
 -- https://www.phpmyadmin.net/
