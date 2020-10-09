@@ -1,3 +1,11 @@
+# DCS Stat Collection via Slmod and insert into MySql DB
+
+# Author: Chris Barilla (Panda)
+# Date:   09/05/2020
+
+# Filename: stat_collector.py
+# Version: 0.0.1
+
 import mysql.connector
 # pip install git+https://github.com/SirAnthony/slpp
 from slpp import slpp as lua
