@@ -18,5 +18,10 @@
 3. Import stats.sql on mysql server
 4. Edit stats_collector.py to complete the #MYSQL Setup section
 5. Edit Get_Stats.bat to include the correct path for your python executable and the correct location of stat_collector.py
-6. DCS Server re-start script (Windows Task Scheduler)
-7. Task Scheduler task to run Get_Stats.bat before DCS Server Restart
+6. Setup DCS Server Startup and Shut Down scheduler tasks on an interval that you want stats updated (RECOMMENDED: Daily)
+<ul>
+  <li>Create windows scheduler task to run DCSServerShutdown.bat script to shutdown DCS server</li>
+  <li>Create windows scheduler task to run the Get_Stats.bat script 1 minute after the the shutdown task above</li>
+  <li>Create windows scheduler task to Start DCS server with command (Your Path may be different)
+    "C:\\Eagle Dynamics\DCS World OpenBeta Server\bin\DCS.exe" --server --norender -w serverName</li>
+  </ul>
