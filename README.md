@@ -22,6 +22,6 @@
 <ul>
   <li>Create windows scheduler task to run DCSServerShutdown.bat script to shutdown DCS server</li>
   <li>Create windows scheduler task to run the Get_Stats.bat script 1 minute after the the shutdown task above</li>
-  <li>Create windows scheduler task to Start DCS server with command (Your Path may be different)
+  <li>Create windows scheduler task to Start DCS server 5 minutes after the Get_stats.bat task above with command (Your Path may be different)
     "C:\\Eagle Dynamics\DCS World OpenBeta Server\bin\DCS.exe" --server --norender -w serverName</li>
   </ul>
