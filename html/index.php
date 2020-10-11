@@ -14,6 +14,7 @@ require_once 'includes.php';
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
+		<title>Stats</title>
 	<link rel="stylesheet" type="text/css" media="all" href="css/stats.css">
 	</head>
 	<body>
