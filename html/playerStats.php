@@ -49,6 +49,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
+		<title>Player Stats</title>
 	<link rel="stylesheet" type="text/css" media="all" href="css/stats.css">
 	</head>
 	<body>
