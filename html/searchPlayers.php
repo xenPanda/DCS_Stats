@@ -18,6 +18,7 @@ $searchName = $_GET['searchName'];
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
+		<title>Search Players</title>
 	<link rel="stylesheet" type="text/css" media="all" href="css/stats.css">
 	</head>
 	<body>
