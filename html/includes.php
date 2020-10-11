@@ -13,7 +13,7 @@ require_once 'db_connector.php';
 
   function get_top10($column, $kill_type, $con ) {
 
-    $sql = "SELECT SUM($column) as a2a_kills, playerid, airframe FROM kills WHERE kill_type = '$kill_type' GROUP By playerid DESC LIMIT 10";
+    $sql = "SELECT SUM($column) as a2a_kills, playerid, airframe FROM kills WHERE kill_type = '$kill_type' GROUP By playerid ORDER BY a2a_kills DESC LIMIT 10";
     $result = mysqli_query($con, $sql);
     
     $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
