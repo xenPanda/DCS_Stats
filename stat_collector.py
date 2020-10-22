@@ -1,29 +1,42 @@
 # DCS_Stats - DCS stats collection via Slmod and insert into MySql DB
 
 # Author: Chris Barilla (Panda)
-# Date:   09/05/2020
+# Date:   10/22/2020
 
 # Filename: stat_collector.py
-# Version: 0.0.1
+# Version: 0.0.2
 
 import mysql.connector
 # pip install git+https://github.com/SirAnthony/slpp
-from slpp import slpp as lua
+# from slpp import slpp as lua
+import re
 from datetime import datetime
 
 #MySQL Setup
 db = mysql.connector.connect(
-  host="",
-  user="",
+  host="localhost",
+  user="root",
   passwd="",
-  database=""
+  database="stats"
 )
 mycursor = db.cursor()
 #End MySQL Setup
 
 # SlmodStats File Location
-slmod_data = "C:\\Users\\root\\Saved Games\\Server\\Slmod\\SlmodStats.lua"
+slmod_data = "C:\\Users\\chris\\Saved Games\\DCS.openbeta_server\\Slmod\\SlmodStats.lua"
 #End SlmodStats File Location
+
+def lua2json(lua):
+    d = re.sub("[ \t\n\r\f\v]", "", lua)  # remove spaces, line returns, tabs etc
+    d = re.sub("=", ": ", d)  # replace = with :
+    d = re.sub(",", ", ", d)  # add a space to commas
+    #d = re.sub('"', "'", d)  # replace " with '
+    d = re.sub('--+([a-zA-Z0-9_"-\[]*)+\]', " ", d)
+    d = re.sub("[][]", "", d)  # remove []
+    d = re.sub("--+([a-zA-Z0-9_]*)", "", d)
+    #d = re.sub(", }", "}", d)  #
+    d = re.sub("} }", "}}", d)  #
+    return d
 
 def insert_weapon_stats(weapon_stats):
     sql = "INSERT INTO weapons (playerid, airframe, weapon, hit, kills, shot, numHits) VALUES (%(playerid)s,%(airframe)s, %(weapon)s, %(hit)s, %(kills)s, %(shot)s, %(numHits)s) ON DUPLICATE KEY UPDATE hit = VALUES(hit), kills = VALUES(kills), shot = VALUES(shot), numHits = VALUES(numHits)"
@@ -47,7 +60,7 @@ def insert_kill_stats(kill_stats):
 
 def new_player_db_insert(db_player_info):
 
-    sql = "INSERT INTO players (id, playername) VALUES (%(playerid)s,%(playername)s) ON DUPLICATE KEY UPDATE playername = VALUES(playername)"
+    sql = "INSERT INTO players (id, playername, updated) VALUES (%(playerid)s,%(playername)s,%(updated)s) ON DUPLICATE KEY UPDATE playername = VALUES(playername), updated = VALUES(updated)"
     mycursor.execute(sql, db_player_info)
     db.commit()
 
@@ -69,20 +82,27 @@ file = open(slmod_data)
 data = file.read()
 file.close()
 d1 = data.split('stats =')[1]
+d1 = d1.split('-- end of stats')[0]
 #print(d1)
-player = lua.decode(d1)
+#player = lua.decode(d1)
 #print(player)
+player = lua2json(d1)
+player = eval(player)
 player.pop('host', None)
+#print(player)
 for key, value in player.items():
     playerid = key
     player_name_list = list(player[playerid]['names'].values())
     playername = player_name_list[-1]
+    now = datetime.now()
+    updated = now.strftime('%Y-%m-%d')
     for k, v in player[playerid]['times'].items():
         airframe = k
         airframe_total_time, airframe_in_air, total_deaths, crash_deaths, ejection_deaths = airframe_stats(playerid, airframe)
         db_player_info = {
             'playerid' : playerid,
             'playername' : playername,
+            'updated' : updated,
         }
         new_player_db_insert(db_player_info)
         db_player_stats = {
@@ -164,10 +184,22 @@ for key, value in player.items():
             #print(lso)
             trap_no = lso[0]
             grade_line = lso[1].split('GRADE:')[1]
-            grade = grade_line.split(' : ')[0]
-            comment = grade_line.split(' : ')[1]
-            wire = comment.split('WIRE#' )[1]
-            wire = wire[1]
+            #print(grade_line)
+            #grade = grade_line.split(':')[0]
+            #print(grade)
+            #print(grade_line)
+            try:
+                grade, comment = grade_line.split(':')
+            except ValueError:
+                continue
+            #print(comment)
+            try:
+                wire = comment.split('WIRE#' )[1]
+                wire = wire[1]
+            except ValueError:
+                continue
+            #wire = comment.split('WIRE#' )[1]
+            #wire = wire[1]
             now = datetime.now()
             date = now.strftime('%Y-%m-%d')
             #print(date)
