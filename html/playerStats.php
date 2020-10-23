@@ -12,6 +12,8 @@ require_once 'includes.php';
 $playerid = $_GET['playerid'];
 $playername = get_playername($playerid,$con);
 $playername = $playername[0]['playername'];
+$updated = get_updatedDate($playerid,$con);
+$updated = $updated[0]['updated'];
 $player_stats = get_player_stats($playerid, $con);
 $player_airframes = get_player_airframes($playerid, $con);
 $weapon_stats = get_player_weapon_stats($playerid, $con);
@@ -55,7 +57,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
 	<body>
 		<div class="layout-column">
 			<header id="page-header">
-				<a href="/">CSG-3 Pilot Statistics</a>
+				<a href="/">CSG-3 Pilot Statistics<br />Last Updated: <?php echo $updated; ?></a>
 			</header>
 			<section id="page-content">
 <div class="pilot-page">

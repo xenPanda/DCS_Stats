@@ -47,6 +47,18 @@ require_once 'db_connector.php';
   
   }
 
+  function get_updatedDate($playerid,$con){
+  
+    $sql = "SELECT updated FROM players WHERE id = '$playerid'";
+    $result = mysqli_query($con, $sql);
+    
+    $updated = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    mysqli_free_result($result);
+    //mysqli_close($con);
+    return $updated;
+  
+  }
+
   function get_search_results($searchName, $con) {
 
     $sql = "SELECT playername, id FROM players WHERE playername LIKE '%{$searchName}%'";
