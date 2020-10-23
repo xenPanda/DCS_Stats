@@ -5,7 +5,7 @@
   Date:   09/05/2020
 
   Filename: includes.php
-  Version: 0.0.1
+  Version: 0.0.2
 -->
 <?php
 require_once 'db_connector.php';
