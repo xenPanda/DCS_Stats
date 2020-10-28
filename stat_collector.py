@@ -42,12 +42,13 @@ def remove_trailing_commas(json_like):
     return trailing_array_commas_re.sub("]", objects_fixed)
 
 def lua2json(lua):
-    d = re.sub("[ \t\n\r\f\v]", "", lua)  # remove spaces, line returns, tabs etc
+    d = re.sub("[\t\n\r]", "", lua)  # remove spaces, line returns, tabs etc \t\n\r\f\v
+    d = re.sub("\s{2,}", "", d)
     d = re.sub("=", ": ", d)  # replace = with :
     d = re.sub(",", ", ", d)  # add a space to commas
     ##d = re.sub('"', "'", d)  # replace " with '
     #d = re.sub('--endof\["[a-zA-Z0-9]+"\]', "", d)
-    d = re.sub('--endof\[[^]]+]', '', d)
+    d = re.sub('-- end of \[[^]]+]', '', d)
     d = re.sub("[][]", "", d)  # remove []
     ##d = re.sub("--+([a-zA-Z0-9_]*)", "", d)
     ##d = re.sub(", }", "}", d)  #
@@ -104,7 +105,6 @@ d1 = d1.split('-- end of stats')[0]
 #player = lua.decode(d1)
 #print(player)
 player = lua2json(d1)
-player = eval(player)
 player = remove_trailing_commas(player)
 player = eval(player)
 player.pop('host', None)
@@ -215,8 +215,8 @@ for key, value in player.items():
             try:
                 wire = comment.split('WIRE#' )[1]
                 wire = wire[1]
-            except ValueError:
-                continue
+            except IndexError:
+                wire = 0
             #wire = comment.split('WIRE#' )[1]
             #wire = wire[1]
             now = datetime.now()
