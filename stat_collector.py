@@ -62,7 +62,7 @@ def insert_weapon_stats(weapon_stats):
     db.commit()
 
 def insert_lso_grade(lso_grade):
-    sql = "INSERT IGNORE INTO traps (playerid, airframe, trap_no, grade, comment, wire, date) VALUES (%(playerid)s,%(airframe)s, %(trap_no)s, %(grade)s, %(comment)s, %(wire)s, %(date)s)"
+    sql = "INSERT IGNORE INTO traps (playerid, airframe, trap_no, grade, pts, comment, wire, date) VALUES (%(playerid)s,%(airframe)s, %(trap_no)s, %(grade)s, %(pts)s, %(comment)s, %(wire)s, %(date)s)"
     mycursor.execute(sql, lso_grade)
     db.commit()
 
@@ -209,6 +209,22 @@ for key, value in player.items():
             #print(grade_line)
             try:
                 grade, comment = grade_line.split(':')
+                grade = grade.strip()
+                pts = None
+                if grade == '_OK_':
+                    pts = 5
+                elif grade == 'OK':
+                    pts = 4
+                elif grade == '(OK)':
+                    pts = 3
+                elif grade == 'B':
+                    pts = 2.5
+                elif grade == '---':
+                    pts = 2
+                elif grade == 'TWO':
+                    pts = 1
+                elif grade == 'C':
+                    pts = 0
             except ValueError:
                 continue
             #print(comment)
@@ -228,6 +244,7 @@ for key, value in player.items():
                 'grade' : grade,
                 'comment' : comment,
                 'wire' : wire,
+                'pts': pts,
                 'trap_no' : trap_no,
                 'date' : date,
             }
