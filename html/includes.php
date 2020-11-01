@@ -5,7 +5,7 @@
   Date:   09/05/2020
 
   Filename: includes.php
-  Version: 0.0.2
+  Version: 0.0.3
 -->
 <?php
 require_once 'db_connector.php';
@@ -193,5 +193,27 @@ require_once 'db_connector.php';
         return $row;
       
     }
+
+    function get_traps_byPlayerName($con, $year) {
+
+      $sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '%3__' GROUP BY players.playername";
+      $result = mysqli_query($con, $sql);
+      
+      $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+      mysqli_free_result($result);
+      return $row;
+    
+  }
+
+  function get_ptsAvg_byMonth($con, $playerId, $month, $year) {
+
+    $sql = "SELECT AVG(traps.pts) as 'pts' FROM traps WHERE playerid = '$playerId' AND month(`date`)='$month' AND year(`date`)='$year' ";
+    $result = mysqli_query($con, $sql);
+    
+    $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    mysqli_free_result($result);
+    return $row;
+  
+}
 
 ?>

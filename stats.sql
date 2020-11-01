@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 23, 2020 at 02:52 AM
+-- Generation Time: Nov 01, 2020 at 07:50 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.4
 
@@ -88,6 +88,7 @@ CREATE TABLE `traps` (
   `airframe` varchar(30) NOT NULL,
   `trap_no` int(10) NOT NULL,
   `wire` int(10) NOT NULL,
+  `pts` float DEFAULT NULL,
   `grade` varchar(10) NOT NULL,
   `comment` varchar(250) NOT NULL,
   `date` date NOT NULL
