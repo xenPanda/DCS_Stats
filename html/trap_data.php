@@ -1,41 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <title>vCSG-3 Greenie Board</title>
-        <!-- Bootstrap core CSS -->
-       <!--<link href="http://demos.codexworld.com/includes/css/bootstrap.css" rel="stylesheet"> -->
-        <!-- Add custom CSS here -->
-        <link href="https://demos.codexworld.com/includes/css/style.css" rel="stylesheet">
-		
-		<link href="css/mystyle.css" rel="stylesheet">
-
-        <style type="text/css">
-    
-        </style>
-</head>
-<body>
 <?php
+
+$year = $_GET['year'];
+$squad = $_GET['squad'];
+
 require_once 'includes.php';
-$year = date("Y"); 
+
+function get_traps_byPlayerName_squad($con, $year, $squad) {
+
+    //$sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '%3__' GROUP BY players.playername";
+    $sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '$squad' GROUP BY players.playername";
+    $result = mysqli_query($con, $sql);
+    
+    $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    mysqli_free_result($result);
+    return $row;
+  
+}
 ?>
-
-<div class="demo-title"><h4>vCSG-3 Greenie Board</h4></div>
-        <div class="container">
-
-    <div class="row">
-        <div class="col-lg-12">
-                        <div class="panel panel-default">
-                <div class="panel-heading">
-                   <select id="year" name="year" title="Select year to show!" >
-                       <option <?php echo "value = " . $year;?>><?php echo $year;?></option>
-                   </select> Carrier Landing LSO Grades
-                    
-                </div>
-                <div class="panel-body">
-
 
     <!-- Data list table --> 
     <table class="table table-bordered">
@@ -59,8 +40,7 @@ $year = date("Y");
         </thead>
         <tbody>
 <?php
-
-$traps = get_traps_byPlayerName($con, $year);
+$traps = get_traps_byPlayerName_squad($con, $year, $squad);
 foreach( $traps as $trap){
     $playerName = $trap['playername'];
     $playerId = $trap['id'];
@@ -107,8 +87,5 @@ foreach( $traps as $trap){
             </tr>
 		<?php	
 } //End of Loop
+
 ?>
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="js/traps.js"></script>
-</body>
-</html>

@@ -139,7 +139,7 @@ require_once 'db_connector.php';
 
     function get_kill_stats($playerid, $con) {
 
-        $sql = "SELECT kill_type, kill_sub_type FROM kills WHERE playerid = '$playerid'";
+        $sql = "SELECT kill_type, kill_sub_type FROM kills WHERE playerid = '$playerid' GROUP BY kill_sub_type";
         $result = mysqli_query($con, $sql);
         
         $kills = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -183,6 +183,17 @@ require_once 'db_connector.php';
                
     }
 
+    function get_lso_gradesByMonth($playerid, $month, $con) {
+
+      $sql = "SELECT * FROM traps WHERE playerid = '$playerid' AND month(date) = '$month' ORDER BY trap_no DESC";
+      $result = mysqli_query($con, $sql);
+      
+      $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+      mysqli_free_result($result);
+      return $row;
+    
+  }
+
     function get_lso_grades($playerid, $con) {
 
         $sql = "SELECT * FROM traps WHERE playerid = '$playerid' ORDER BY trap_no DESC LIMIT 10";
@@ -196,7 +207,8 @@ require_once 'db_connector.php';
 
     function get_traps_byPlayerName($con, $year) {
 
-      $sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '%3__' GROUP BY players.playername";
+      //$sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '%3__' GROUP BY players.playername";
+      $sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' GROUP BY players.playername";
       $result = mysqli_query($con, $sql);
       
       $row = mysqli_fetch_all($result, MYSQLI_ASSOC);

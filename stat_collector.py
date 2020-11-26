@@ -10,7 +10,7 @@ import mysql.connector
 # pip install git+https://github.com/SirAnthony/slpp
 # from slpp import slpp as lua
 import re
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 #MySQL Setup
 db = mysql.connector.connect(
@@ -43,7 +43,7 @@ def remove_trailing_commas(json_like):
 
 def lua2json(lua):
     d = re.sub("[\t\n\r]", "", lua)  # remove spaces, line returns, tabs etc \t\n\r\f\v
-    d = re.sub("\s{2,}", "", d)
+    d = re.sub("\s{3,}", "", d)
     d = re.sub("=", ": ", d)  # replace = with :
     d = re.sub(",", ", ", d)  # add a space to commas
     ##d = re.sub('"', "'", d)  # replace " with '
@@ -235,8 +235,10 @@ for key, value in player.items():
                 wire = 0
             #wire = comment.split('WIRE#' )[1]
             #wire = wire[1]
-            now = datetime.now()
-            date = now.strftime('%Y-%m-%d')
+            #now = datetime.now()
+            #date = now.strftime('%Y-%m-%d')
+            yesterday = datetime.now() - timedelta(days=1)
+            date = yesterday.strftime('%Y-%m-%d')
             #print(date)
             lso_grade = {
                 'playerid' : playerid,
