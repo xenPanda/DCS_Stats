@@ -13,13 +13,14 @@
 
 ## INSTALLATION
 
+(For multi server setup you will need separate folders for each server for step 2)
+
 1. Setup items from the ## Requirements section
-2. Save Get_Stat.bat and stat_collector.py to a directory on the DCS Server
+2. Save Get_Stat.bat, stat_collector.py and config.ini to a folder or multiple folders in the case of multi server setups on the DCS Server
 3. Import stats.sql on mysql server
-4. Edit stats_collector.py to complete the #MYSQL Setup section
-5. Edit stats_collector.py slmod_data variable to the correct path to your SlmodStats.lua file
-6. Edit Get_Stats.bat to include the correct path for your python executable and the correct location of stat_collector.py
-7. Setup DCS Server Startup and Shut Down scheduler tasks on an interval that you want stats updated (RECOMMENDED: Daily)
+4. Edit config.ini to complete the mysql and server sections (server name should be unique for each instance of config.ini)
+5. Edit Get_Stats.bat to include the correct path for your python executable and the correct location of stat_collector.py
+6. Setup DCS Server Startup and Shut Down scheduler tasks on an interval that you want stats updated (RECOMMENDED: Daily)
 <ul>
   <li>Create windows scheduler task to run DCSServerShutdown.bat script to shutdown DCS server</li>
   <li>Create windows scheduler task to run the Get_Stats.bat script 1 minute after the the shutdown task above</li>
