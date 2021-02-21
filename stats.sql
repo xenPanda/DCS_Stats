@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 01, 2020 at 07:50 AM
+-- Generation Time: Feb 21, 2021 at 07:59 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.4
 
@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `airframe_stats` (
   `airframe` varchar(30) NOT NULL,
   `playerid` varchar(32) NOT NULL,
+  `serverid` varchar(32) NOT NULL,
   `total_time` float(12,4) NOT NULL,
   `air_time` float(12,4) NOT NULL,
   `pilot_deaths` int(10) NOT NULL,
@@ -45,6 +46,7 @@ CREATE TABLE `airframe_stats` (
 
 CREATE TABLE `kills` (
   `playerid` varchar(32) NOT NULL,
+  `serverid` varchar(32) NOT NULL,
   `airframe` varchar(30) NOT NULL,
   `kill_type` varchar(30) NOT NULL,
   `kill_sub_type` varchar(30) NOT NULL,
@@ -60,7 +62,7 @@ CREATE TABLE `kills` (
 CREATE TABLE `players` (
   `playername` varchar(50) NOT NULL,
   `id` varchar(32) NOT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created` date NOT NULL DEFAULT current_timestamp(),
   `updated` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -72,9 +74,20 @@ CREATE TABLE `players` (
 
 CREATE TABLE `pvp` (
   `playerid` varchar(32) NOT NULL,
+  `serverid` varchar(32) NOT NULL,
   `airframe` varchar(30) NOT NULL,
   `result` varchar(10) NOT NULL,
   `number` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `servers`
+--
+
+CREATE TABLE `servers` (
+  `serverid` varchar(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -85,6 +98,7 @@ CREATE TABLE `pvp` (
 
 CREATE TABLE `traps` (
   `playerid` varchar(32) NOT NULL,
+  `serverid` varchar(32) NOT NULL,
   `airframe` varchar(30) NOT NULL,
   `trap_no` int(10) NOT NULL,
   `wire` int(10) NOT NULL,
@@ -102,6 +116,7 @@ CREATE TABLE `traps` (
 
 CREATE TABLE `weapons` (
   `playerid` varchar(32) NOT NULL,
+  `serverid` varchar(32) NOT NULL,
   `airframe` varchar(30) NOT NULL,
   `weapon` varchar(30) NOT NULL,
   `hit` int(10) NOT NULL,
@@ -140,6 +155,12 @@ ALTER TABLE `pvp`
   ADD PRIMARY KEY (`playerid`,`airframe`,`result`) USING BTREE;
 
 --
+-- Indexes for table `servers`
+--
+ALTER TABLE `servers`
+  ADD PRIMARY KEY (`serverid`);
+
+--
 -- Indexes for table `traps`
 --
 ALTER TABLE `traps`
@@ -149,7 +170,7 @@ ALTER TABLE `traps`
 -- Indexes for table `weapons`
 --
 ALTER TABLE `weapons`
-  ADD PRIMARY KEY (`playerid`,`airframe`,`weapon`);
+  ADD PRIMARY KEY (`playerid`,`airframe`,`weapon`) USING BTREE;
 
 --
 -- Constraints for dumped tables
