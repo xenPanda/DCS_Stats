@@ -11,21 +11,31 @@
 require_once 'db_connector.php';
 
 
-  function get_top10($column, $kill_type, $con ) {
+  function get_top10($column, $kill_type, $con, $server) {
 
-    $sql = "SELECT SUM($column) as a2a_kills, playerid, airframe FROM kills WHERE kill_type = '$kill_type' GROUP By playerid ORDER BY a2a_kills DESC LIMIT 10";
+    $sql = "SELECT SUM($column) as a2a_kills, playerid, airframe FROM kills WHERE kill_type = '$kill_type' AND serverid LIKE '$server' GROUP By playerid ORDER BY a2a_kills DESC LIMIT 10";
     $result = mysqli_query($con, $sql);
     
     $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
     mysqli_free_result($result);
 
-        return $row; 
-           
+        return $row;            
 }
 
-  function get_top10_time($con){
+function get_servers($con) {
 
-    $sql = "SELECT airframe, playerid, air_time FROM airframe_stats ORDER BY air_time DESC LIMIT 10";
+  $sql = "SELECT * FROM servers";
+  $result = mysqli_query($con, $sql);
+  
+  $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+  mysqli_free_result($result);
+
+      return $row;            
+}
+
+  function get_top10_time($con, $server){
+
+    $sql = "SELECT airframe, playerid, air_time FROM airframe_stats WHERE serverid LIKE '$server' ORDER BY air_time DESC LIMIT 10";
     $result = mysqli_query($con, $sql);
     
     $stats = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -70,9 +80,9 @@ require_once 'db_connector.php';
   
     }
 
-    function get_player_stats($playerid, $con) {
+    function get_player_stats($playerid, $con, $server) {
 
-        $sql = "SELECT * FROM airframe_stats WHERE playerid = '$playerid'";
+        $sql = "SELECT * FROM airframe_stats WHERE playerid = '$playerid' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $player_stats = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -81,9 +91,9 @@ require_once 'db_connector.php';
       
     }
 
-    function get_column_sum($column, $playerid, $con ) {
+    function get_column_sum($column, $playerid, $con, $server) {
 
-        $sql = "SELECT SUM($column) FROM airframe_stats WHERE playerid = '$playerid'";
+        $sql = "SELECT SUM($column) FROM airframe_stats WHERE playerid = '$playerid' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -92,9 +102,9 @@ require_once 'db_connector.php';
         return $row;        
     }
 
-    function get_player_airframes($playerid, $con) {
+    function get_player_airframes($playerid, $con, $server) {
 
-        $sql = "SELECT airframe, total_time, air_time FROM airframe_stats WHERE playerid = '$playerid'";
+        $sql = "SELECT airframe, total_time, air_time FROM airframe_stats WHERE playerid = '$playerid' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $player_airframes = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -115,9 +125,9 @@ require_once 'db_connector.php';
     }
 
 
-    function get_player_weapon_stats($playerid, $con) {
+    function get_player_weapon_stats($playerid, $con, $server) {
 
-        $sql = "SELECT weapon, hit, shot, kills FROM weapons WHERE playerid = '$playerid'";
+        $sql = "SELECT weapon, hit, shot, kills FROM weapons WHERE playerid = '$playerid' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $weapon_stats = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -126,9 +136,9 @@ require_once 'db_connector.php';
       
     }
 
-    function get_weapon_sum($column, $playerid, $weapon_type, $con ) {
+    function get_weapon_sum($column, $playerid, $weapon_type, $con, $server ) {
 
-        $sql = "SELECT SUM($column) FROM weapons WHERE playerid = '$playerid' AND weapon = '$weapon_type'";
+        $sql = "SELECT SUM($column) FROM weapons WHERE playerid = '$playerid' AND weapon = '$weapon_type' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -137,9 +147,9 @@ require_once 'db_connector.php';
         return $row;        
     }
 
-    function get_kill_stats($playerid, $con) {
+    function get_kill_stats($playerid, $con, $server) {
 
-        $sql = "SELECT kill_type, kill_sub_type FROM kills WHERE playerid = '$playerid' GROUP BY kill_sub_type";
+        $sql = "SELECT kill_type, kill_sub_type FROM kills WHERE playerid = '$playerid' AND serverid LIKE '$server' GROUP BY kill_sub_type";
         $result = mysqli_query($con, $sql);
         
         $kills = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -148,9 +158,9 @@ require_once 'db_connector.php';
       
     }
 
-    function get_kill_sum($column, $playerid, $kill_type, $kill_sub_type, $con ) {
+    function get_kill_sum($column, $playerid, $kill_type, $kill_sub_type, $con, $server ) {
 
-        $sql = "SELECT SUM($column) FROM kills WHERE playerid = '$playerid' AND kill_sub_type = '$kill_sub_type'";
+        $sql = "SELECT SUM($column) FROM kills WHERE playerid = '$playerid' AND kill_sub_type = '$kill_sub_type' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -159,28 +169,26 @@ require_once 'db_connector.php';
         return $row;        
     }
 
-    function get_kills_total($column, $playerid, $kill_type, $con ) {
+    function get_kills_total($column, $playerid, $kill_type, $con, $server ) {
 
-        $sql = "SELECT SUM($column) FROM kills WHERE playerid = '$playerid' AND kill_type = '$kill_type'";
+        $sql = "SELECT SUM($column) FROM kills WHERE playerid = '$playerid' AND kill_type = '$kill_type' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
         mysqli_free_result($result);
 
-            return $row; 
-               
+            return $row;                
     }
 
-    function get_pvp_total($column, $playerid, $result_type, $con ) {
+    function get_pvp_total($column, $playerid, $result_type, $con, $server ) {
 
-        $sql = "SELECT SUM($column) FROM pvp WHERE playerid = '$playerid' AND result = '$result_type'";
+        $sql = "SELECT SUM($column) FROM pvp WHERE playerid = '$playerid' AND result = '$result_type' AND serverid LIKE '$server'";
         $result = mysqli_query($con, $sql);
         
         $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
         mysqli_free_result($result);
 
-            return $row; 
-               
+            return $row;               
     }
 
     function get_lso_gradesByMonth($playerid, $month, $con) {
@@ -194,9 +202,9 @@ require_once 'db_connector.php';
     
   }
 
-    function get_lso_grades($playerid, $con) {
+    function get_lso_grades($playerid, $con, $server) {
 
-        $sql = "SELECT * FROM traps WHERE playerid = '$playerid' ORDER BY trap_no DESC LIMIT 10";
+        $sql = "SELECT * FROM traps WHERE playerid = '$playerid' AND serverid LIKE '$server' ORDER BY trap_no DESC LIMIT 10";
         $result = mysqli_query($con, $sql);
         
         $row = mysqli_fetch_all($result, MYSQLI_ASSOC);

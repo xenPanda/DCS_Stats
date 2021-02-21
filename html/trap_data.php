@@ -2,19 +2,19 @@
 
 $year = $_GET['year'];
 $squad = $_GET['squad'];
+$server = $_GET['server'];
 
 require_once 'includes.php';
 
-function get_traps_byPlayerName_squad($con, $year, $squad) {
+function get_traps_byPlayerName_squad($con, $year, $squad, $server) {
 
     //$sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '%3__' GROUP BY players.playername";
-    $sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '$squad' GROUP BY players.playername";
+    $sql = "SELECT players.playername, players.id FROM traps JOIN players ON traps.playerid = players.id WHERE year(`date`) = '$year' AND players.playername LIKE '$squad' AND traps.serverid LIKE '$server' GROUP BY players.playername";
     $result = mysqli_query($con, $sql);
     
     $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
     mysqli_free_result($result);
     return $row;
-  
 }
 ?>
 
@@ -40,7 +40,7 @@ function get_traps_byPlayerName_squad($con, $year, $squad) {
         </thead>
         <tbody>
 <?php
-$traps = get_traps_byPlayerName_squad($con, $year, $squad);
+$traps = get_traps_byPlayerName_squad($con, $year, $squad, $server);
 foreach( $traps as $trap){
     $playerName = $trap['playername'];
     $playerId = $trap['id'];
@@ -69,7 +69,7 @@ foreach( $traps as $trap){
     $novChip = floor($novAvg[0]['pts']);
     $decChip = floor($decAvg[0]['pts']);
 ?>			
-		 <tr>
+		<tr>
                 <td id="name"><?php echo $playerName ; ?></td>
                 <td id="jan" ><a href="traps.php?playerId=<?php echo $playerId ?>&playerName=<?php echo $playerName ;?>&month=1&year=<?php echo $year; ?>"><li class = "gScore-<?php echo $janChip; ?>"></li></a></td>
                 <td id="feb" ><a href="traps.php?playerId=<?php echo $playerId ?>&playerName=<?php echo $playerName ;?>&month=2&year=<?php echo $year; ?>"><li class = "gScore-<?php echo $febChip; ?>"></li></a></td>
@@ -87,5 +87,5 @@ foreach( $traps as $trap){
             </tr>
 		<?php	
 } //End of Loop
-
+print_r($_GET);
 ?>

@@ -5,49 +5,18 @@
   Date:   09/05/2020
 
   Filename: playerStats.php
-  Version: 0.0.1
+  Version: 0.0.3
 -->
 <?php
 require_once 'includes.php';
 $playerid = $_GET['playerid'];
-$playername = get_playername($playerid,$con);
-$playername = $playername[0]['playername'];
+//$server = '%';
+//print_r($playerid);
 $updated = get_updatedDate($playerid,$con);
 $updated = $updated[0]['updated'];
-$player_stats = get_player_stats($playerid, $con);
-$player_airframes = get_player_airframes($playerid, $con);
-$weapon_stats = get_player_weapon_stats($playerid, $con);
-$lso_grades = get_lso_grades($playerid, $con);
-$kill_stats = get_kill_stats($playerid, $con);
-$ground_kill_stats = get_kill_stats($playerid, $con);
-$helicopter_kill_stats = get_kill_stats($playerid, $con);
-$ship_kill_stats = get_kill_stats($playerid, $con);
-$building_kill_stats = get_kill_stats($playerid, $con);
-$total_air_kills = 0;
-$total_ground_kills = 0;
-$total_helicopter_kills = 0;
-$total_ship_kills = 0;
-$total_building_kills = 0;
-//Column Variables
-$column_total_time = 'total_time';
-$column_air_time = 'air_time';
-$column_total_deaths = 'pilot_deaths';
-$column_crash_deaths = 'crash_deaths';
-$column_ejection_deaths = 'ejection_deaths';
-
-
-$total_time = get_column_sum($column_total_time, $playerid, $con);
-$total_time = convert_time($total_time[0]['SUM(total_time)']) ; 
-$air_time = get_column_sum($column_air_time, $playerid, $con);
-$air_time = convert_time($air_time[0]['SUM(air_time)']);
-$total_deaths = get_column_sum($column_total_deaths, $playerid, $con);
-$total_deaths = $total_deaths[0]['SUM(pilot_deaths)'] ;
-$crash_deaths = get_column_sum($column_crash_deaths, $playerid, $con);
-$crash_deaths = $crash_deaths[0]['SUM(crash_deaths)'] ;
-$ejection_deaths = get_column_sum($column_ejection_deaths, $playerid, $con);
-$ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
+$playername = get_playername($playerid,$con);
+$playername = $playername[0]['playername'];
 ?>
-
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
@@ -67,10 +36,67 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
                 echo htmlspecialchars($playername); 
             ?>
         </h1>
+        <div class="panel-heading">
+                    <form action="player.php" method="get" id="filter">
+                    <select id="server" name="server" title="Select your server!" >
+                    <option selected value="%">All</option>
+                    <?php
+                    $servers = get_servers($con, $server);
+                    print_r($servers);
+                    foreach($servers as $server){
+                        $serverid = $server['serverid'];
+                        echo "<option value = " . $serverid . ">" . $serverid . "</option>";
+                    }
+                    ?>
+                    </select>
+					<input type="hidden" id="playerid" name="playerid" value= "<?php echo $playerid; ?>" />
+                    <button type="submit">Submit</button>
+                </form>
+                </div>
         <h2>
             Logbook
         </h2>
     </div>
+			<div id="display_table" class="panel-body">
+<?php
+//print_r($playerid);
+//echo '</br>';
+$server = '%';
+//print_r($server);
+$player_stats = get_player_stats($playerid, $con, $server);
+$player_airframes = get_player_airframes($playerid, $con, $server);
+$weapon_stats = get_player_weapon_stats($playerid, $con, $server);
+$lso_grades = get_lso_grades($playerid, $con, $server);
+$kill_stats = get_kill_stats($playerid, $con, $server);
+$ground_kill_stats = get_kill_stats($playerid, $con, $server);
+$helicopter_kill_stats = get_kill_stats($playerid, $con, $server);
+$ship_kill_stats = get_kill_stats($playerid, $con, $server);
+$building_kill_stats = get_kill_stats($playerid, $con, $server);
+$total_air_kills = 0;
+$total_ground_kills = 0;
+$total_helicopter_kills = 0;
+$total_ship_kills = 0;
+$total_building_kills = 0;
+//Column Variables
+$column_total_time = 'total_time';
+$column_air_time = 'air_time';
+$column_total_deaths = 'pilot_deaths';
+$column_crash_deaths = 'crash_deaths';
+$column_ejection_deaths = 'ejection_deaths';
+
+
+$total_time = get_column_sum($column_total_time, $playerid, $con, $server);
+$total_time = convert_time($total_time[0]['SUM(total_time)']) ; 
+$air_time = get_column_sum($column_air_time, $playerid, $con, $server);
+$air_time = convert_time($air_time[0]['SUM(air_time)']);
+$total_deaths = get_column_sum($column_total_deaths, $playerid, $con, $server);
+$total_deaths = $total_deaths[0]['SUM(pilot_deaths)'] ;
+$crash_deaths = get_column_sum($column_crash_deaths, $playerid, $con, $server);
+$crash_deaths = $crash_deaths[0]['SUM(crash_deaths)'] ;
+$ejection_deaths = get_column_sum($column_ejection_deaths, $playerid, $con, $server);
+$ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
+?>
+
 	<div class="columns-row">
 		<div class="column quarter">
 			<table class="vertical">
@@ -87,7 +113,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
 							PvP Kills
 						</th>
 						<td>
-                            <?php $pvp_kills = get_pvp_total('number', $playerid, 'kills', $con); 
+                            <?php $pvp_kills = get_pvp_total('number', $playerid, 'kills', $con, $server); 
                             if (is_null($pvp_kills[0]['SUM(number)']))
                             {
                                 $pvp_kills = 0;
@@ -105,7 +131,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
 							PvP Losses
 						</th>
 						<td>
-                        <?php $pvp_losses = get_pvp_total('number', $playerid, 'losses', $con); 
+                        <?php $pvp_losses = get_pvp_total('number', $playerid, 'losses', $con, $server); 
                             if (is_null($pvp_losses[0]['SUM(number)']))
                             {
                                 $pvp_losses = 0;
@@ -124,7 +150,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
 						</th>
 						<td>
                             <?php  
-                            $total_a2a_kills = get_kills_total('kill_no', $playerid, 'Planes', $con);
+                            $total_a2a_kills = get_kills_total('kill_no', $playerid, 'Planes', $con, $server);
                             //print_r($total_a2a_kills);
                             if (is_null($total_a2a_kills[0]['SUM(kill_no)']))
                         {
@@ -141,7 +167,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
 						</th>
 						<td>
                         <?php
-                        $total_a2g_kills = get_kills_total('kill_no', $playerid, 'Ground Units', $con);
+                        $total_a2g_kills = get_kills_total('kill_no', $playerid, 'Ground Units', $con, $server);
                         //print_r($total_a2g_kills);
                         if (is_null($total_a2g_kills[0]['SUM(kill_no)']))
                         {
@@ -263,7 +289,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
                                 //print($kill_type);
                                 //print($kill_sub_type);
                                 //$kill_type = 'Planes';
-                                $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con);
+                                $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con, $server);
                                 //print_r($sum_kill_no);
                                 $kill_no = $sum_kill_no[0]['SUM(kill_no)'];
                                 //print($kill_no);
@@ -298,7 +324,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
                             //print($kill_type);
                             //print($kill_sub_type);
                             //$kill_type = 'Gound Units';
-                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con);
+                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con, $server);
                             //print_r($sum_kill_no);
                             $kill_no = $sum_kill_no[0]['SUM(kill_no)'];
                             //print($kill_no);
@@ -333,7 +359,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
                             //print($kill_type);
                             //print($kill_sub_type);
                             //$kill_type = 'Gound Units';
-                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con);
+                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con, $server);
                             //print_r($sum_kill_no);
                             $kill_no = $sum_kill_no[0]['SUM(kill_no)'];
                             //print($kill_no);
@@ -368,7 +394,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
                             //print($kill_type);
                             //print($kill_sub_type);
                             //$kill_type = 'Gound Units';
-                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con);
+                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con, $server);
                             //print_r($sum_kill_no);
                             $kill_no = $sum_kill_no[0]['SUM(kill_no)'];
                             //print($kill_no);
@@ -403,7 +429,7 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
                             //print($kill_type);
                             //print($kill_sub_type);
                             //$kill_type = 'Gound Units';
-                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con);
+                            $sum_kill_no = get_kill_sum('kill_no', $playerid, $kill_type, $kill_sub_type, $con, $server);
                             //print_r($sum_kill_no);
                             $kill_no = $sum_kill_no[0]['SUM(kill_no)'];
                             //print($kill_no);
@@ -482,11 +508,11 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
                             //print_r($value);
                             $weapon_type = $value['weapon'];
                             //print($weapon_type);
-                            $numHits = get_weapon_sum('numHits', $playerid, $weapon_type, $con);
+                            $numHits = get_weapon_sum('numHits', $playerid, $weapon_type, $con, $server);
                             $numHits = $numHits[0]['SUM(numHits)'];
-                            $shot = get_weapon_sum('shot', $playerid, $weapon_type, $con);
+                            $shot = get_weapon_sum('shot', $playerid, $weapon_type, $con, $server);
                             $shot = $shot[0]['SUM(shot)'];
-                            $kills = get_weapon_sum('kills', $playerid, $weapon_type, $con);
+                            $kills = get_weapon_sum('kills', $playerid, $weapon_type, $con, $server);
                             $kills = $kills[0]['SUM(kills)'];
                             echo '<tr> <td>'. $weapon_type . '</td> <td class="weapons">'. $shot . '</td> <td class="weapons">'. $numHits . '</td> <td class="weapons">'. $kills . '</td> </tr>';
                         }
@@ -498,12 +524,27 @@ $ejection_deaths = $ejection_deaths[0]['SUM(ejection_deaths)'] ;
 
 </div>
 			</section>
+</div>
 			<footer id="page-footer">
 
 			</footer>
 		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 		<script>
+		$("#filter").submit(function(event) {
+  event.preventDefault(); //prevent default action 
+  let post_url = $(this).attr("action"); //get form action url
+  let request_method = $(this).attr("method"); //get form GET/POST method
+  let form_data = $(this).serialize(); //Encode form elements for submission	
+    $.ajax({
+        url: post_url,
+        type: request_method,
+        data: form_data
+    }).done(function(response) { //
+        $("#display_table").html(response);
+    });
+});
+
 			$(function() {
 				$('body').addClass('loaded');
 				$('.submit-on-change').change(function(event) {

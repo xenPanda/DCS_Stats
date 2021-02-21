@@ -2,6 +2,7 @@
 require_once 'includes.php';
 $year = date("Y"); 
 $squad = '%';
+$server = '%';
 ?>
 <!DOCTYPE html>
 <html>
@@ -11,7 +12,7 @@ $squad = '%';
 
         <title>vCSG-3 Greenie Board</title>
         <!-- Bootstrap core CSS -->
-       <!--<link href="http://demos.codexworld.com/includes/css/bootstrap.css" rel="stylesheet"> -->
+        <!--<link href="http://demos.codexworld.com/includes/css/bootstrap.css" rel="stylesheet"> -->
         <!-- Add custom CSS here -->
         <link href="https://demos.codexworld.com/includes/css/style.css" rel="stylesheet">
 		
@@ -32,9 +33,20 @@ $squad = '%';
                         <div class="panel panel-default">                          
                 <div class="panel-heading">
                     <form action="trap_data.php" method="get" id="filter">
-                   <select id="year" name="year" title="Select year to show!" ></select>
-                   <select id="squad" name="squad" title="Select your squad!" ></select>
-                   <button type="submit">Submit</button>
+                    <select id="year" name="year" title="Select year to show!" ></select>
+                    <select id="squad" name="squad" title="Select your squad!" ></select>
+                    <select id="server" name="server" title="Select your server!" >
+                    <option selected value="%">All</option>
+                    <?php
+                    $servers = get_servers($con);
+                    print_r($servers);
+                    foreach($servers as $server){
+                        $serverid = $server['serverid'];
+                        echo "<option value = " . $serverid . ">" . $serverid . "</option>";
+                    }
+                    ?>
+                    </select>
+                    <button type="submit">Submit</button>
                 </form>
                 </div>
                 <div id="display_table" class="panel-body">
@@ -42,28 +54,28 @@ $squad = '%';
 </div>
 <script>
 
-      $("#filter").submit(function(event) {
+        $("#filter").submit(function(event) {
           event.preventDefault(); //prevent default action 
           let post_url = $(this).attr("action"); //get form action url
           let request_method = $(this).attr("method"); //get form GET/POST method
           let form_data = $(this).serialize(); //Encode form elements for submission	
-          $.ajax({
-              url: post_url,
-              type: request_method,
-              data: form_data
+            $.ajax({
+                url: post_url,
+                type: request_method,
+                data: form_data
             }).done(function(response) { //
-              $("#display_table").html(response);
+                $("#display_table").html(response);
             });
         });
 $( document ).ready( function (){
-  var year = (new Date).getFullYear();
+    var year = (new Date).getFullYear();
     $.ajax({
         url: "trap_data.php",
         type: "GET",
-        data: $('#form').serialize() + '&year=' + year + '&squad=%'
+        data: $('#form').serialize() + '&year=' + year + '&squad=%' + '&server=%'
        }).done(function(response) { //
-         $("#display_table").html(response);
-       });
+            $("#display_table").html(response);
+        });
     });
 
 $('#year').each(function() {
@@ -85,6 +97,7 @@ $('#squad').each(function() {
     $(this).append('<option value="%3__">Sidewinders</option>');
     $(this).append('<option value="%4__">Fighting Bengals</option>');
 });
+
 </script>
 
 </body>

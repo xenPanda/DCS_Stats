@@ -4,28 +4,34 @@
 # Date:   10/22/2020
 
 # Filename: stat_collector.py
-# Version: 0.0.2
+# Version: 0.0.3
 
 import mysql.connector
 # pip install git+https://github.com/SirAnthony/slpp
 # from slpp import slpp as lua
 import re
 from datetime import datetime, date, timedelta
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read("config.ini")
 
 #MySQL Setup
 db = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  passwd="",
-  database="stats"
+    host=config.get('mysql', 'host'),
+    user=config.get('mysql', 'user'),
+    passwd=config.get('mysql', 'passwd'),
+    database=config.get('mysql', 'database')
 )
 mycursor = db.cursor()
 #End MySQL Setup
 
 # SlmodStats File Location
-slmod_data = "C:\\Users\\chris\\Saved Games\\DCS.openbeta_server\\Slmod\\SlmodStats.lua"
+slmod_data, serverID = config['server'].values()
+#slmod_data = config.get('server', 'path')
 #End SlmodStats File Location
-
+#print(slmod_data)
+#print(serverID)
 def remove_trailing_commas(json_like):
     """
     Removes trailing commas from *json_like* and returns the result.  Example::
@@ -56,23 +62,28 @@ def lua2json(lua):
     d= re.sub("true", "True", d)
     return d
 
+def add_server(server):
+    sql = "INSERT INTO servers (serverid) VALUES (%(serverID)s) ON DUPLICATE KEY UPDATE serverid = VALUES(serverID)"
+    mycursor.execute(sql, server)
+    db.commit()
+
 def insert_weapon_stats(weapon_stats):
-    sql = "INSERT INTO weapons (playerid, airframe, weapon, hit, kills, shot, numHits) VALUES (%(playerid)s,%(airframe)s, %(weapon)s, %(hit)s, %(kills)s, %(shot)s, %(numHits)s) ON DUPLICATE KEY UPDATE hit = VALUES(hit), kills = VALUES(kills), shot = VALUES(shot), numHits = VALUES(numHits)"
+    sql = "INSERT INTO weapons (playerid, serverid, airframe, weapon, hit, kills, shot, numHits) VALUES (%(playerid)s, %(serverID)s, %(airframe)s, %(weapon)s, %(hit)s, %(kills)s, %(shot)s, %(numHits)s) ON DUPLICATE KEY UPDATE hit = VALUES(hit), kills = VALUES(kills), shot = VALUES(shot), numHits = VALUES(numHits)"
     mycursor.execute(sql, weapon_stats)
     db.commit()
 
 def insert_lso_grade(lso_grade):
-    sql = "INSERT IGNORE INTO traps (playerid, airframe, trap_no, grade, pts, comment, wire, date) VALUES (%(playerid)s,%(airframe)s, %(trap_no)s, %(grade)s, %(pts)s, %(comment)s, %(wire)s, %(date)s)"
+    sql = "INSERT IGNORE INTO traps (playerid, serverid, airframe, trap_no, grade, pts, comment, wire, date) VALUES (%(playerid)s, %(serverID)s, %(airframe)s, %(trap_no)s, %(grade)s, %(pts)s, %(comment)s, %(wire)s, %(date)s)"
     mycursor.execute(sql, lso_grade)
     db.commit()
 
 def insert_pvp_stats(pvp_stats):
-    sql = "INSERT INTO pvp (playerid, airframe, result, number) VALUES (%(playerid)s,%(airframe)s, %(result)s, %(number)s) ON DUPLICATE KEY UPDATE number = VALUES(number)"
+    sql = "INSERT INTO pvp (playerid, serverid, airframe, result, number) VALUES (%(playerid)s, %(serverID)s, %(airframe)s, %(result)s, %(number)s) ON DUPLICATE KEY UPDATE number = VALUES(number)"
     mycursor.execute(sql, pvp_stats)
     db.commit()
 
 def insert_kill_stats(kill_stats):
-    sql = "INSERT INTO kills (playerid, airframe, kill_type, kill_sub_type, kill_no) VALUES (%(playerid)s,%(airframe)s, %(kill_type)s, %(kill_sub_type)s, %(kill_no)s) ON DUPLICATE KEY UPDATE kill_no = VALUES(kill_no)"
+    sql = "INSERT INTO kills (playerid, serverid, airframe, kill_type, kill_sub_type, kill_no) VALUES (%(playerid)s, %(serverID)s, %(airframe)s, %(kill_type)s, %(kill_sub_type)s, %(kill_no)s) ON DUPLICATE KEY UPDATE kill_no = VALUES(kill_no)"
     mycursor.execute(sql, kill_stats)
     db.commit()
 
@@ -84,7 +95,7 @@ def new_player_db_insert(db_player_info):
 
 def insert_player_stats(db_player_stats):
 
-    sql = "INSERT INTO airframe_stats (airframe, playerid, total_time, air_time, pilot_deaths, crash_deaths, ejection_deaths) VALUES (%(airframe)s,%(playerid)s,%(total_time)s,%(air_time)s,%(pilot_deaths)s,%(crash_deaths)s,%(ejection_deaths)s) ON DUPLICATE KEY UPDATE total_time = VALUES(total_time), air_time = VALUES(air_time), pilot_deaths = VALUES(pilot_deaths), crash_deaths = VALUES(crash_deaths), ejection_deaths = VALUES(ejection_deaths)"
+    sql = "INSERT INTO airframe_stats (airframe, playerid, serverid, total_time, air_time, pilot_deaths, crash_deaths, ejection_deaths) VALUES (%(airframe)s,%(playerid)s,%(serverID)s,%(total_time)s,%(air_time)s,%(pilot_deaths)s,%(crash_deaths)s,%(ejection_deaths)s) ON DUPLICATE KEY UPDATE total_time = VALUES(total_time), air_time = VALUES(air_time), pilot_deaths = VALUES(pilot_deaths), crash_deaths = VALUES(crash_deaths), ejection_deaths = VALUES(ejection_deaths)"
     mycursor.execute(sql, db_player_stats)
     db.commit()
 
@@ -95,6 +106,11 @@ def airframe_stats(playerid, airframe):
     crash_deaths = player.get(playerid).get('times', {}).get(airframe, {}).get('actions', {}).get('losses', {}).get('crash', 0)
     ejection_deaths = player.get(playerid).get('times', {}).get(airframe, {}).get('actions', {}).get('losses', {}).get('eject', 0)
     return airframe_total_time, airframe_in_air, total_deaths, crash_deaths, ejection_deaths
+
+server = {
+    'serverID' : serverID,
+}
+add_server(server)
 
 file = open(slmod_data)
 data = file.read()
@@ -127,6 +143,7 @@ for key, value in player.items():
         db_player_stats = {
             'airframe' : airframe,
             'playerid' : playerid,
+            'serverID' : serverID,
             'total_time' : airframe_total_time,
             'air_time' : airframe_in_air,
             'pilot_deaths' : total_deaths,
@@ -156,6 +173,7 @@ for key, value in player.items():
             shot = weapon_stats_dict['shot']
             weapon_stats = {
                 'playerid' : playerid,
+                'serverID': serverID,
                 'airframe' : airframe,
                 'weapon' : weapon_type,
                 'numHits' : numHits,
@@ -183,6 +201,7 @@ for key, value in player.items():
                     #print(kill_no)
                     kill_stats = {
                         'playerid' : playerid,
+                        'serverID': serverID,
                         'airframe' : airframe,
                         'kill_type' : kill_type,
                         'kill_sub_type' : kill_sub_type,
@@ -194,6 +213,7 @@ for key, value in player.items():
             pvp_number = pvp[1]
             pvp_stats = {
                 'playerid' : playerid,
+                'serverID': serverID,
                 'airframe' : airframe,
                 'result' : pvp_result,
                 'number' : pvp_number,
@@ -242,6 +262,7 @@ for key, value in player.items():
             #print(date)
             lso_grade = {
                 'playerid' : playerid,
+                'serverID': serverID,
                 'airframe' : airframe,
                 'grade' : grade,
                 'comment' : comment,
