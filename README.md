@@ -27,3 +27,56 @@
   <li>Create windows scheduler task to Start DCS server 5 minutes after the Get_stats.bat task above with command (Your Path may be different)
     "C:\\Eagle Dynamics\DCS World OpenBeta Server\bin\DCS.exe" --server --norender -w serverName</li>
   </ul>
+
+## UPDATE FROM 7.5 version ***A clean install is recommended but if you choose you can try to update with the following steps***
+
+How to update current install:
+
+
+1.
+Add new field to serverid VARCHAR 32 to tables:
+airframe_stats
+kills
+pvp
+traps
+weapons
+
+run sql command on each table Replace TABLENAME and CURRENT_SERVERID as appropriate
+UPDATE `TABLE` SET `serverid`='CURRENT_SERVERID'
+
+3.
+Update players table to add:
+  `created` date NOT NULL DEFAULT current_timestamp(),
+  `updated` date NOT NULL
+
+
+
+4. 
+add new table servers to existing database with field serverid and make serverid primary key 
+
+	CREATE TABLE `servers` (
+	  `serverid` varchar(32) NOT NULL
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+	ALTER TABLE `servers`
+	  ADD PRIMARY KEY (`serverid`);
+
+5.
+Add new field to traps table
+  `pts` float DEFAULT NULL,
+
+6.
+Update following files to new version
+config.ini file 
+stat_collector.py
+html\greenierBoard.php 
+html\includes.php
+html\index.php
+html\playerStats.php 
+html\css\stats.css
+
+7.
+Add following new files
+html\player.php
+html\trap_data.php
+html\top10.php
