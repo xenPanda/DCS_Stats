@@ -55,12 +55,12 @@ $searchName = $_GET['searchName'];
                     $playerid = $player['id'];
                     $playername = $player['playername'];
                     $column_total_time = 'total_time';
-                    $total_time = get_column_sum($column_total_time, $playerid, $con);
+                    $total_time = get_column_sum($column_total_time, $playerid, $con, '%');
                     $total_time = convert_time($total_time[0]['SUM(total_time)']) ; 
                     //$column_total_air_kills = 'total_air_kills';
                     //$total_air_kills = get_column_sum($column_total_air_kills, $playerid, $con);
                     //$total_air_kills = $total_air_kills[0]['SUM(total_air_kills)'] ;
-                    $total_a2a_kills = get_kills_total('kill_no', $playerid, 'Planes', $con);
+                    $total_a2a_kills = get_kills_total('kill_no', $playerid, 'Planes', $con, '%');
                     //print_r($total_a2a_kills);
                     if (is_null($total_a2a_kills[0]['SUM(kill_no)']))
                 {
