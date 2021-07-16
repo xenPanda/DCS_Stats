@@ -5,10 +5,10 @@ from datetime import datetime, date, timedelta
 
 #MySQL Setup
 db = mysql.connector.connect(
-  host="vcsg3.com",
-  user="uzfjsveo_statmanager",
-  passwd="2O#-9a}0qn[J",
-  database="uzfjsveo_csg3_stats"
+  host="server",
+  user="user",
+  passwd="password",
+  database="database"
 )
 mycursor = db.cursor()
 #End MySQL Setup
