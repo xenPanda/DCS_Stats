@@ -62,7 +62,7 @@ CREATE TABLE `kills` (
 CREATE TABLE `players` (
   `playername` varchar(50) NOT NULL,
   `id` varchar(32) NOT NULL,
-  `created` date NOT NULL DEFAULT current_timestamp(),
+  `created` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
